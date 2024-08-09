@@ -35,11 +35,4 @@ if prompt:
 
 
 
-#button = st.button("清除历史记录来重新对话")  #  add test
-#if button and not openai_api_key:        #  add test
-#    st.info("请输入你的OpenAI API密钥")
-#if button and openai_api_key and "memory" in st.session_state:
-#    for message in st.session_state["messages"]:
-
-
 
