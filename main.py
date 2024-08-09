@@ -3,6 +3,13 @@ from langchain.memory import ConversationBufferMemory
 
 from utils import get_chat_response
 
+from typing import List
+from langchain.output_parsers import PydanticOutputParser
+from langchain.prompts import ChatPromptTemplate
+from langchain.schema import HumanMessage
+from langchain_core.pydantic_v1 import BaseModel, Field
+from langchain_openai import ChatOpenAI
+
 st.title("💬 克隆ChatGPT")
 
 with st.sidebar:
