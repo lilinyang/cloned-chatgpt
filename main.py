@@ -1,26 +1,34 @@
+
 import streamlit as st
+from langchain.memory import ConversationBufferMemory
+
+from utils import get_chat_response
+
+st.title("💬 克隆ChatGPT")
 
 with st.sidebar:
-    name = st.text_input("请输入你的名字：")
-    if name:
-        st.write(f"你好，{name}")
+    openai_api_key = st.text_input("请输入OpenAI API Key：", type="password")
+    st.markdown("[获取OpenAI API key](https://platform.openai.com/account/api-keys)")
 
-column1, column2, column3 = st.columns([1, 2, 3])
-with column1:
-    password = st.text_input("请输入你的密码：", type="password")
+if "memory" not in st.session_state:
+    st.session_state["memory"] = ConversationBufferMemory(return_messages=True)
+    st.session_state["messages"] = [{"role": "ai",
+                                     "content": "你好，我是你的AI助手，有什么可以帮你的吗？"}]
 
-with column2:
-    paragraph = st.text_area("请输入一段自我介绍：")
+for message in st.session_state["messages"]:
+    st.chat_message(message["role"]).write(message["content"])
 
-with column3:
-    age = st.number_input("请输入你的年龄：", value=20, min_value=0, max_value=150, step=1)
-    st.write(f"你的年龄是：{age}岁")
+prompt = st.chat_input()
+if prompt:
+    if not openai_api_key:
+        st.info("请输入你的OpenAI API Key")
+        st.stop()
+    st.session_state["messages"].append({"role": "human", "content": prompt})
+    st.chat_message("human").write(prompt)
 
-checked = st.checkbox("我同意以上条款")
-if checked:
-    st.write("感谢你的同意！")
-
-st.divider()
-submitted = st.button("提交")
-if submitted:
-    st.write("提交成功！")
+    with st.spinner("AI正在思考中，请稍等..."):
+        response = get_chat_response(prompt, st.session_state["memory"],
+                                     openai_api_key)
+    msg = {"role": "ai", "content": response}
+    st.session_state["messages"].append(msg)
+    st.chat_message("ai").write(response)
